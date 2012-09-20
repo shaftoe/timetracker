@@ -1,14 +1,14 @@
 require 'sqlite3'
 
 
-class DataStore
+class TTDataStore
 
-  def initialize dbname=".timetracker.db", version=0.1
+  def initialize dbname=".timetrackerdb", timezone=2, version=0.1, verbosity=0
     @dbname = dbname
     if FileTest.zero?(dbname) or not FileTest.file?(dbname)
       @db = SQLite3::Database.new( dbname )
       createschema
-      init(version)
+      init(timezone, version, verbosity)
     else
       @db = SQLite3::Database.open( dbname )
     end
@@ -24,7 +24,7 @@ class DataStore
       version INTEGER NOT NULL,
       verbosity NOT NULL,
       redmine
-    );
+    )
     SQL
 
     @db.execute <<-SQL
@@ -35,15 +35,38 @@ class DataStore
       tstop,
       synced DEFAULT 'false',
       notes
-    );
+    )
     SQL
   end
 
-  def init version
-    @db.execute 'INSERT INTO system ( timezone, version, verbosity ) VALUES ( 2, %s, 0 );' % version
+  def init timezone, version, verbosity
+    @db.execute 'INSERT INTO system ( timezone, version, verbosity ) VALUES ( %s, %s, %s )' %
+      [timezone, version, verbosity]
   end
 
-end # End db class
+  def setcurrent issueid
+    oldcurrent = @db.execute 'SELECT current FROM system'
+    @db.execute "UPDATE system SET current = '%d', latest = '%s'" % [issueid, oldcurrent[0][0]]
+  end
+
+  public
+  def startnew issuename, notes=''
+    @db.execute "INSERT INTO timesheet ( name, notes ) VALUES ( '%s', '%s' )" %
+      [issuename, notes]
+    latest = @db.execute "SELECT id FROM timesheet ORDER BY id DESC LIMIT 1"
+    setcurrent latest[0][0]
+  end
+
+  def stoprunning
+    running = @db.execute "SELECT current FROM system"
+    unless running[0][0] == ''
+      @db.execute "UPDATE timesheet set tstop = datetime('now') WHERE id = %d" % running[0][0]
+      @db.execute "UPDATE system SET current = '', latest = '%d'" % running[0][0]
+    else
+      p "Not tracking"
+    end
+  end
+end  # End DataStore class
 
 
-db = DataStore.new
+db = TTDataStore.new
