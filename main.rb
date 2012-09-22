@@ -1,5 +1,6 @@
+#!/usr/bin/ruby -w
+# -*- coding: utf-8 -*-
 require 'sqlite3'
-
 
 class TTDataStore
 
@@ -45,8 +46,9 @@ class TTDataStore
   end
 
   def setcurrent issueid
-    oldcurrent = @db.execute 'SELECT current FROM system'
-    @db.execute "UPDATE system SET current = '%d', latest = '%s'" % [issueid, oldcurrent[0][0]]
+    oldcurrent = @db.execute 'SELECT current, latest FROM system'
+    @db.execute "UPDATE system SET current = '%d', latest = '%s'" %
+      [issueid, oldcurrent[0][0] != '' ? oldcurrent[0][0] : oldcurrent[0][1]]
   end
 
   public
@@ -70,3 +72,10 @@ end  # End DataStore class
 
 
 db = TTDataStore.new
+
+if ARGV[0] == 'start'
+  db.startnew ARGV[1]
+end
+if ARGV[0] == 'stop'
+  db.stoprunning
+end
