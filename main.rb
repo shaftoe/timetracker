@@ -4,7 +4,7 @@ require 'sqlite3'
 
 class TTDataStore
 
-  def initialize dbname=".timetrackerdb", timezone=2, version=0.1, verbosity=0
+  def initialize dbname=".timetrackerdb", timezone=0, version=0.0, verbosity=0
     @dbname = dbname
     if FileTest.zero?(dbname) or not FileTest.file?(dbname)
       @db = SQLite3::Database.new( dbname )
@@ -71,11 +71,29 @@ class TTDataStore
 end  # End DataStore class
 
 
-db = TTDataStore.new
+class TimeTracker
+
+  def initialize
+    @db = TTDataStore.new
+  end
+
+  def start
+    @db.startnew ARGV[1]
+  end
+
+  def stop
+    @db.stoprunning
+  end
+
+end
+
+
 
 if ARGV[0] == 'start'
-  db.startnew ARGV[1]
+  tt = TimeTracker.new
+  tt.start
 end
 if ARGV[0] == 'stop'
-  db.stoprunning
+  tt = TimeTracker.new
+  tt.stop
 end
