@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/Users/alex/.rvm/rubies/ruby-1.9.2-p290/bin/ruby -w
 # -*- coding: utf-8 -*-
 require 'sqlite3'
 
@@ -52,6 +52,21 @@ class TTDataStore
   end
 
   public
+  def getcurrent
+    current = @db.execute "SELECT current FROM system"
+    current[0][0] == "" ? nil : current[0][0]
+  end
+
+  def getstatus
+    current = getcurrent
+    if current
+      status = @db.execute "SELECT id,name FROM timesheet WHERE id=%d" % current
+      status[0]
+    else
+      nil
+    end
+  end
+
   def startnew issuename, notes=''
     @db.execute "INSERT INTO timesheet ( name, notes ) VALUES ( '%s', '%s' )" %
       [issuename, notes]
@@ -60,14 +75,25 @@ class TTDataStore
   end
 
   def stoprunning
-    running = @db.execute "SELECT current FROM system"
-    unless running[0][0] == ''
-      @db.execute "UPDATE timesheet set tstop = datetime('now') WHERE id = %d" % running[0][0]
-      @db.execute "UPDATE system SET current = '', latest = '%d'" % running[0][0]
+    current = getcurrent
+    if current
+      @db.execute "UPDATE timesheet set tstop = datetime('now') WHERE id = %d" % current
+      @db.execute "UPDATE system SET current = '', latest = '%d'" % current
     else
       p "Not tracking"
     end
   end
+
+  def gettime issueid=false
+    issueid = issueid ? issueid : getcurrent
+    if issueid
+      time = @db.execute "SELECT tstart,tstop FROM timesheet WHERE id=%d" % issueid
+      time[0]
+    else
+      false
+    end
+  end
+
 end  # End DataStore class
 
 
@@ -77,23 +103,70 @@ class TimeTracker
     @db = TTDataStore.new
   end
 
-  def start
-    @db.startnew ARGV[1]
+  def start issuename, notes
+    unless issuename == nil
+      if @db.getcurrent
+        @db.stoprunning
+      end
+      @db.startnew issuename, notes
+    else
+      usage
+    end
   end
 
   def stop
     @db.stoprunning
   end
 
+  def status
+    status = @db.getstatus
+    if status
+      p "Running task %s" % status[1]
+    else
+      p "Not running"
+    end
+  end
+
+  def gettimeobject timestamp
+    Time.utc(
+      timestamp[0,4],
+      timestamp[5,7],
+      timestamp[8,10],
+      timestamp[11,13],
+      timestamp[14,16],
+      timestamp[17,19]
+    )
+  end
+
+  def getduration issueid
+    timestamps = @db.gettime issueid
+    if timestamps and timestamps[1]
+      t0, t1 = gettimeobject(timestamps[0]), gettimeobject(timestamps[1])
+      p t0, t1
+    else
+      p "%d not valid" % issueid
+    end
+  end
+
+  def usage
+    p "Usage: %s [start|stop] issue_name" % $0
+  end
+
+end  # End TimeTracker class
+
+
+tt = TimeTracker.new
+case ARGV[0]
+  when 'start' then
+    tt.start ARGV[1], ARGV[2]
+  when 'stop' then
+    tt.stop
+  when 'status' then
+    tt.status
+  when 'time'
+    tt.getduration ARGV[1]
+  else tt.usage
 end
 
 
-
-if ARGV[0] == 'start'
-  tt = TimeTracker.new
-  tt.start
-end
-if ARGV[0] == 'stop'
-  tt = TimeTracker.new
-  tt.stop
-end
+# add time calculation to status
