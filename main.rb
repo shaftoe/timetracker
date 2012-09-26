@@ -104,6 +104,14 @@ class TTDataStore
     end
   end
 
+  def gettimesbyissuename issuename
+    @db.execute "SELECT tstart,tstop FROM timesheet WHERE name='%s'" % issuename
+  end
+
+  def getissuesandtimesbyname issuename
+    @db.execute "SELECT tstart,tstop FROM timesheet WHERE name='%s'" % issuename
+  end
+
   def cleanup
     droptables
     createschema
@@ -137,7 +145,8 @@ class TimeTracker
   def status
     status = @db.getstatus
     if status
-      p "Running task %s" % status[1]
+      delta = Time.now - gettstart(@db.getcurrent)
+      p "Task '%s' running for %d seconds" % [status[1], delta]
     else
       p "Not running"
     end
@@ -146,6 +155,16 @@ class TimeTracker
   def init
     @db.cleanup
   end
+
+  def test name
+    gettotalissueduration(name)
+  end
+
+  def usage
+    p "Usage: %s [start|stop] issue_name" % $0
+  end
+
+  private
   def gettimeobject timestamp
     Time.utc(
       timestamp[0,4],
@@ -157,19 +176,43 @@ class TimeTracker
     )
   end
 
-  def getduration issueid
+  def gettotalissueduration issuename
+    r = @db.getissuesandtimesbyname(issuename)
+    total = 0
+    r.each do |timestamps|
+      if timestamps[0] and timestamps[1]
+        t0, t1 = gettimeobject(timestamps[0]), gettimeobject(timestamps[1])
+        total = total + (t1 - t0)
+      end
+    end
+    total
+  end
+
+  def getissueduration issueid
     timestamps = @db.gettime issueid
     if timestamps and timestamps[1]
       t0, t1 = gettimeobject(timestamps[0]), gettimeobject(timestamps[1])
-      p t0, t1
+      t1 - t0
     else
-      p "%d not valid" % issueid
+      false
     end
   end
 
-  def usage
-    p "Usage: %s [start|stop] issue_name" % $0
+  def gettstart issueid
+    timestamps = @db.gettime issueid
+    unless timestamps[0] == nil
+      gettimeobject timestamps[0]
+    end
   end
+
+  def gettstop issueid
+    timestamps = @db.gettime issueid
+    unless timestamps[1] == nil
+      gettimeobject timestamps[1]
+    end
+  end
+
+
 
 end  # End TimeTracker class
 
