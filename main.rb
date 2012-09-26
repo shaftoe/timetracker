@@ -142,22 +142,32 @@ class TimeTracker
     @db.stoprunning
   end
 
-  def status
-    status = @db.getstatus
-    if status
-      delta = Time.now - gettstart(@db.getcurrent)
-      p "Task '%s' running for %d seconds" % [status[1], delta]
+  def status issuename
+    unless issuename
+      status = @db.getstatus
+      if status
+        delta = Time.now - gettstart(@db.getcurrent)
+        p "Task '%s' running for %d seconds" % [status[1], delta]
+      else
+        p "Not tracking"
+      end
     else
-      p "Not running"
+      total = gettotalissueduration(issuename)
+      unless total == 0
+        p "Total seconds for task %s: %d (%.2f hours)" % 
+          [
+            issuename,
+            total,
+            total / 3600
+          ]
+      else
+        p "No entry for issue '%s'" % issuename
+      end
     end
   end
 
   def init
     @db.cleanup
-  end
-
-  def test name
-    gettotalissueduration(name)
   end
 
   def usage
@@ -166,21 +176,25 @@ class TimeTracker
 
   private
   def gettimeobject timestamp
-    Time.utc(
-      timestamp[0,4],
-      timestamp[5,7],
-      timestamp[8,10],
-      timestamp[11,13],
-      timestamp[14,16],
-      timestamp[17,19]
-    )
+    if timestamp
+      Time.utc(
+        timestamp[0,4],
+        timestamp[5,7],
+        timestamp[8,10],
+        timestamp[11,13],
+        timestamp[14,16],
+        timestamp[17,19]
+      )
+    else
+      Time.now
+    end
   end
 
   def gettotalissueduration issuename
     r = @db.getissuesandtimesbyname(issuename)
     total = 0
     r.each do |timestamps|
-      if timestamps[0] and timestamps[1]
+      if timestamps[0]
         t0, t1 = gettimeobject(timestamps[0]), gettimeobject(timestamps[1])
         total = total + (t1 - t0)
       end
@@ -212,8 +226,6 @@ class TimeTracker
     end
   end
 
-
-
 end  # End TimeTracker class
 
 
@@ -224,7 +236,7 @@ case ARGV[0]
   when 'stop' then
     tt.stop
   when 'status' then
-    tt.status
+    tt.status ARGV[1]
   when 'init' then
     tt.init
   when 'test' then
