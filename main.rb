@@ -4,8 +4,12 @@ require 'sqlite3'
 
 class TTDataStore
 
-  def initialize dbname=".timetrackerdb", timezone=0, version=0.0, verbosity=0
+  def initialize dbname=".timetrackerdb", timezone="+02:00", version='v0.1', verbosity=0
     @dbname = dbname
+    @timezone = timezone
+    @version = version
+    @verbosity = verbosity
+
     if FileTest.zero?(dbname) or not FileTest.file?(dbname)
       @db = SQLite3::Database.new( dbname )
       createschema
@@ -41,8 +45,14 @@ class TTDataStore
   end
 
   def init timezone, version, verbosity
-    @db.execute 'INSERT INTO system ( timezone, version, verbosity ) VALUES ( %s, %s, %s )' %
+    @db.execute 'INSERT INTO system ( timezone, version, verbosity ) VALUES ( "%s", "%s", "%s" )' %
       [timezone, version, verbosity]
+  end
+
+  def droptables
+    for table in ['system', 'timesheet']
+      @db.execute 'DROP TABLE IF EXISTS %s' % table
+    end
   end
 
   def setcurrent issueid
@@ -94,6 +104,12 @@ class TTDataStore
     end
   end
 
+  def cleanup
+    droptables
+    createschema
+    init(@timezone, @version, @verbosity)
+  end
+
 end  # End DataStore class
 
 
@@ -127,6 +143,9 @@ class TimeTracker
     end
   end
 
+  def init
+    @db.cleanup
+  end
   def gettimeobject timestamp
     Time.utc(
       timestamp[0,4],
@@ -163,10 +182,9 @@ case ARGV[0]
     tt.stop
   when 'status' then
     tt.status
-  when 'time'
-    tt.getduration ARGV[1]
+  when 'init' then
+    tt.init
+  when 'test' then
+    tt.test ARGV[1]
   else tt.usage
 end
-
-
-# add time calculation to status
