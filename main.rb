@@ -112,6 +112,10 @@ class TTDataStore
     @db.execute "SELECT tstart,tstop FROM timesheet WHERE name='%s'" % issuename
   end
 
+  def getissuesidsbyname issuename
+    @db.execute "SELECT id,tstart,tstop,notes FROM timesheet WHERE name='%s'" % issuename
+  end
+
   def cleanup
     droptables
     createschema
@@ -147,7 +151,7 @@ class TimeTracker
       status = @db.getstatus
       if status
         delta = Time.now - gettstart(@db.getcurrent)
-        p "Task '%s' running for %d seconds" % [status[1], delta]
+        p "Task '%s' run time: %d seconds (%.2f hours)" % [status[1], delta, delta / 3600]
       else
         p "Not tracking"
       end
@@ -166,12 +170,24 @@ class TimeTracker
     end
   end
 
+  def report issuename
+    r = @db.getissuesidsbyname issuename
+    unless r == []
+      p "id | tstart | tstop | notes"
+      r.each do |x|
+        p "%s | %s | %s | %s" % x
+      end
+    else
+      usage
+    end
+  end
+
   def init
     @db.cleanup
   end
 
   def usage
-    p "Usage: %s [start|stop] issue_name" % $0
+    p "Usage: %s [start|stop|status|report] issue_name" % $0
   end
 
   private
@@ -239,6 +255,8 @@ case ARGV[0]
     tt.status ARGV[1]
   when 'init' then
     tt.init
+  when 'report' then
+    tt.report ARGV[1]
   when 'test' then
     tt.test ARGV[1]
   else tt.usage
