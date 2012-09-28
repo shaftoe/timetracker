@@ -116,6 +116,14 @@ class TTDataStore
     @db.execute "SELECT id,tstart,tstop,notes FROM timesheet WHERE name='%s'" % issuename
   end
 
+  def settstart id, tstart
+    @db.execute "UPDATE timesheet SET tstart=datetime('%s') WHERE id=%d" % [tstart, id]
+  end
+
+  def settstop id, tstop
+    @db.execute "UPDATE timesheet SET tstop=datetime('%s') WHERE id=%d" % [tstop, id]
+  end
+
   def cleanup
     droptables
     createschema
@@ -182,12 +190,20 @@ class TimeTracker
     end
   end
 
+  def setstart issueid, timestamp
+    @db.settstart issueid, timestamp
+  end
+
+  def setstop issueid, timestamp
+    @db.settstop issueid, timestamp
+  end
+
   def init
     @db.cleanup
   end
 
   def usage
-    p "Usage: %s [start|stop|status|report] issue_name" % $0
+    p "Usage: %s [start|stop|status|init|report|begin|end] issue_name" % $0
   end
 
   private
@@ -257,7 +273,9 @@ case ARGV[0]
     tt.init
   when 'report' then
     tt.report ARGV[1]
-  when 'test' then
-    tt.test ARGV[1]
+  when 'beguin' then
+    tt.setstart ARGV[1], ARGV[2]
+  when 'end' then
+    tt.setstop ARGV[1], ARGV[2]
   else tt.usage
 end
