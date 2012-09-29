@@ -124,6 +124,11 @@ class TTDataStore
     @db.execute "UPDATE timesheet SET tstop=datetime('%s') WHERE id=%d" % [tstop, id]
   end
 
+  def isissue? id
+    r = @db.execute "SELECT id from timesheet WHERE id=%d" % id
+    r == [] ? false : true
+  end
+
   def cleanup
     droptables
     createschema
@@ -191,13 +196,17 @@ class TimeTracker
   end
 
   def setstart issueid, timestamp
-    t = validatetimestamp timestamp
-    @db.settstart issueid, t
+    if validateissueid issueid
+      t = validatetimestamp timestamp
+      @db.settstart issueid, t
+    end
   end
 
   def setstop issueid, timestamp
-    t = validatetimestamp timestamp
-    @db.settstop issueid, t
+    if validateissueid issueid
+      t = validatetimestamp timestamp
+      @db.settstop issueid, t
+    end
   end
 
   def init
@@ -241,6 +250,15 @@ class TimeTracker
       t.min,
       t.sec
     ]
+  end
+
+  def validateissueid issueid
+    unless @db.isissue? issueid
+      p "Issueid invalid"
+      false
+    else
+      true
+    end
   end
 
   def gettotalissueduration issuename
