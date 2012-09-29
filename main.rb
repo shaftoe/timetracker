@@ -126,7 +126,7 @@ class TTDataStore
 
   def isissue? id
     r = @db.execute "SELECT id from timesheet WHERE id=%d" % id
-    r == [] ? false : true
+    r[0].nil? ? false : true
   end
 
   def cleanup
@@ -145,7 +145,7 @@ class TimeTracker
   end
 
   def start issuename, notes
-    unless issuename == nil
+    unless issuename.nil?
       if @db.getcurrent
         @db.stoprunning
       end
@@ -185,7 +185,7 @@ class TimeTracker
 
   def report issuename
     r = @db.getissuesidsbyname issuename
-    unless r == []
+    unless r[0].nil?
       p "id | tstart | tstop | notes"
       r.each do |x|
         p "%s | %s | %s | %s" % x
@@ -285,14 +285,14 @@ class TimeTracker
 
   def gettstart issueid
     timestamps = @db.gettime issueid
-    unless timestamps[0] == nil
+    unless timestamps[0].nil?
       gettimeobject timestamps[0]
     end
   end
 
   def gettstop issueid
     timestamps = @db.gettime issueid
-    unless timestamps[1] == nil
+    unless timestamps[1].nil?
       gettimeobject timestamps[1]
     end
   end
