@@ -191,11 +191,13 @@ class TimeTracker
   end
 
   def setstart issueid, timestamp
-    @db.settstart issueid, timestamp
+    t = validatetimestamp timestamp
+    @db.settstart issueid, t
   end
 
   def setstop issueid, timestamp
-    @db.settstop issueid, timestamp
+    t = validatetimestamp timestamp
+    @db.settstop issueid, t
   end
 
   def init
@@ -220,6 +222,25 @@ class TimeTracker
     else
       Time.now
     end
+  end
+
+  def validatetimestamp timestamp
+    t = Time.utc(
+        timestamp[0,4],
+        timestamp[5,7],
+        timestamp[8,10],
+        timestamp[11,13],
+        timestamp[14,16],
+        timestamp[17,19]
+      )
+    "%.4d-%.2d-%.2d %.2d:%.2d:%.2d" % [
+      t.year,
+      t.month,
+      t.day,
+      t.hour,
+      t.min,
+      t.sec
+    ]
   end
 
   def gettotalissueduration issuename
@@ -279,3 +300,6 @@ case ARGV[0]
     tt.setstop ARGV[1], ARGV[2]
   else tt.usage
 end
+
+
+# TODO: add support for timezone
