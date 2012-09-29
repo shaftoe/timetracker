@@ -295,9 +295,11 @@ case ARGV[0]
   when 'report' then
     tt.report ARGV[1]
   when 'beguin' then
-    tt.setstart ARGV[1], ARGV[2]
+    timestamp = ARGV[3] ? "%s %s" % ARGV[2,3] : ARGV[2]
+    tt.setstart ARGV[1], timestamp
   when 'end' then
-    tt.setstop ARGV[1], ARGV[2]
+    timestamp = ARGV[3] ? "%s %s" % ARGV[2,3] : ARGV[2]
+    tt.setstop ARGV[1], timestamp
   else tt.usage
 end
 
