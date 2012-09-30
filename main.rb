@@ -221,12 +221,12 @@ class TimeTracker
   def gettimeobject timestamp
     if timestamp
       Time.utc(
-        timestamp[0,4],
-        timestamp[5,7],
-        timestamp[8,10],
-        timestamp[11,13],
-        timestamp[14,16],
-        timestamp[17,19]
+        timestamp[0..3],
+        timestamp[5..6],
+        timestamp[8..9],
+        timestamp[11..12],
+        timestamp[14..15],
+        timestamp[17..18]
       )
     else
       Time.now
@@ -235,12 +235,12 @@ class TimeTracker
 
   def validatetimestamp timestamp
     t = Time.utc(
-        timestamp[0,4],
-        timestamp[5,7],
-        timestamp[8,10],
-        timestamp[11,13],
-        timestamp[14,16],
-        timestamp[17,19]
+        timestamp[0..3],
+        timestamp[5..6],
+        timestamp[8..9],
+        timestamp[11..12],
+        timestamp[14..15],
+        timestamp[17..18]
       )
     "%.4d-%.2d-%.2d %.2d:%.2d:%.2d" % [
       t.year,
@@ -313,10 +313,10 @@ case ARGV[0]
   when 'report' then
     tt.report ARGV[1]
   when 'beguin' then
-    timestamp = ARGV[3] ? "%s %s" % ARGV[2,3] : ARGV[2]
+    timestamp = ARGV[3] ? "%s %s" % ARGV[2..3] : ARGV[2]
     tt.setstart ARGV[1], timestamp
   when 'end' then
-    timestamp = ARGV[3] ? "%s %s" % ARGV[2,3] : ARGV[2]
+    timestamp = ARGV[3] ? "%s %s" % ARGV[2..3] : ARGV[2]
     tt.setstop ARGV[1], timestamp
   else tt.usage
 end
