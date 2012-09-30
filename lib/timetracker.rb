@@ -1,10 +1,4 @@
-#!/Users/alex/.rvm/rubies/ruby-1.9.2-p290/bin/ruby -w
 # -*- coding: utf-8 -*-
-require 'rubygems'
-require 'sqlite3'
-require 'timetracker/datastore'
-
-
 class TimeTracker
 
   def initialize
@@ -31,21 +25,21 @@ class TimeTracker
       status = @db.getstatus
       if status
         delta = Time.now - gettstart(@db.getcurrent)
-        p "Task '%s' run time: %d seconds (%.2f hours)" % [status[1], delta, delta / 3600]
+        puts "Task '%s' run time: %d seconds (%.2f hours)" % [status[1], delta, delta / 3600]
       else
-        p "Not tracking"
+        puts "Not tracking"
       end
     else
       total = gettotalissueduration(issuename)
       unless total == 0
-        p "Total seconds for task %s: %d (%.2f hours)" % 
+        puts "Total seconds for task %s: %d (%.2f hours)" % 
           [
             issuename,
             total,
             total / 3600
           ]
       else
-        p "No entry for issue '%s'" % issuename
+        puts "No entry for issue '%s'" % issuename
       end
     end
   end
@@ -53,9 +47,9 @@ class TimeTracker
   def report issuename
     r = @db.getissuesidsbyname issuename
     unless r[0].nil?
-      p "id | tstart | tstop | notes"
+      puts "id | tstart | tstop | notes"
       r.each do |x|
-        p "%s | %s | %s | %s" % x
+        puts "%s | %s | %s | %s" % x
       end
     else
       usage
@@ -81,7 +75,7 @@ class TimeTracker
   end
 
   def usage
-    p "Usage: timetracker [start|stop|status|init|report|begin|end] issue_name"
+    puts "Usage: timetracker [start|stop|status|init|report|begin|end] issue_name"
   end
 
   private
@@ -121,7 +115,7 @@ class TimeTracker
 
   def validateissueid issueid
     unless @db.isissue? issueid
-      p "Issueid invalid"
+      puts "Issueid invalid"
       false
     else
       true
@@ -166,4 +160,5 @@ class TimeTracker
 
 end  # End TimeTracker class
 
+require 'timetracker/datastore'
 # TODO: add support for timezone

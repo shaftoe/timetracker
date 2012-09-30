@@ -1,4 +1,7 @@
-class DataStore
+# -*- coding: utf-8 -*-
+require 'sqlite3'
+
+class TimeTracker::DataStore
 
   def initialize dbname=".timetrackerdb", timezone="+02:00", version='v0.1', verbosity=0
     @dbname = dbname
