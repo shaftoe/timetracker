@@ -169,4 +169,3 @@ end  # End TTrack class
 
 require 'ttrack/datastore'
 # TODO: add support for timezone
-# TODO: fix default db location, should be in $HOME/

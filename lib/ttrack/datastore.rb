@@ -4,17 +4,17 @@ require 'sqlite3'
 class TTrack::DataStore
 
   def initialize dbname=".timetrackerdb", timezone="+02:00", version='v0.1.0', verbosity=0
-    @dbname = dbname
+    @dbname = "%s/%s" % [ENV['HOME'], dbname]
     @timezone = timezone
     @version = version
     @verbosity = verbosity
 
-    if FileTest.zero?(dbname) or not FileTest.file?(dbname)
-      @db = SQLite3::Database.new( dbname )
+    if FileTest.zero?(@dbname) or not FileTest.file?(@dbname)
+      @db = SQLite3::Database.new( @dbname )
       createschema
       init(timezone, version, verbosity)
     else
-      @db = SQLite3::Database.open( dbname )
+      @db = SQLite3::Database.open( @dbname )
     end
   end
 
