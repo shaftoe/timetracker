@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class TimeTracker
+class TTrack
 
   def initialize
     @db = DataStore.new
@@ -45,11 +45,18 @@ class TimeTracker
   end
 
   def report issuename
-    r = @db.getissuesidsbyname issuename
-    unless r[0].nil?
+    if issuename.nil?
+      r = @db.gettimesheet
+      pstring = "%s | %s | %s | %s | %s"
+      puts "id | name | tstart | tstop | notes"
+    else
+      r = @db.getissuesidsbyname issuename
+      pstring = "%s | %s | %s | %s"
       puts "id | tstart | tstop | notes"
-      r.each do |x|
-        puts "%s | %s | %s | %s" % x
+    end
+    unless r[0].nil?
+        r.each do |x|
+        puts pstring % x
       end
     else
       usage
@@ -75,7 +82,7 @@ class TimeTracker
   end
 
   def usage
-    puts "Usage: timetracker [start|stop|status|init|report|begin|end] issue_name"
+    puts "Usage: ttrack [start|stop|status|init|report|begin|end] issue_name"
   end
 
   private
@@ -158,7 +165,8 @@ class TimeTracker
     end
   end
 
-end  # End TimeTracker class
+end  # End TTrack class
 
-require 'timetracker/datastore'
+require 'ttrack/datastore'
 # TODO: add support for timezone
+# TODO: fix default db location, should be in $HOME/

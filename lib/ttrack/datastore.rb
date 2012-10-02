@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 require 'sqlite3'
 
-class TimeTracker::DataStore
+class TTrack::DataStore
 
-  def initialize dbname=".timetrackerdb", timezone="+02:00", version='v0.1', verbosity=0
+  def initialize dbname=".timetrackerdb", timezone="+02:00", version='v0.1.0', verbosity=0
     @dbname = dbname
     @timezone = timezone
     @version = version
@@ -101,6 +101,10 @@ class TimeTracker::DataStore
     else
       false
     end
+  end
+
+  def gettimesheet
+    @db.execute "SELECT id,name,tstart,tstop,notes FROM timesheet"
   end
 
   def gettimesbyissuename issuename
