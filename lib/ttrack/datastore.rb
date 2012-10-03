@@ -3,7 +3,7 @@ require 'sqlite3'
 
 class TTrack::DataStore
 
-  def initialize dbname=".timetrackerdb", timezone="+02:00", version='v0.1.0', verbosity=0
+  def initialize dbname=".timetrackerdb", timezone="+02:00", version='v0.1.2', verbosity=0
     @dbname = "%s/%s" % [ENV['HOME'], dbname]
     @timezone = timezone
     @version = version
