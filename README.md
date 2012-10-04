@@ -15,39 +15,47 @@ timesheets to some external PM software like Redmine via REST APIs
 
 Install TTrack
 
-	$ gem install ttrack
+    $ gem install ttrack
 
 Initialize sqlite3 db (defualted to $HOME/.timetrackerdb)
 
-	$ ttrack
-	$ ls ~/.timetrackerdb
+    $ ttrack
+    $ ls ~/.timetrackerdb
 
 Start tracking an issue
 
-	$ ttrack start my_issue
+    $ ttrack start my_issue "my notes between quotes"
 
-Check current tracked issue's status
+Works without "start" command too (unless my_issue is a command)
 
-	$ ttrack status
+    $ ttrack my_issue "my notes between quotes"
+
+Check current tracked issue's status / time tracked
+
+    $ ttrack status
+
+Check current or previous issue's time tracked
+
+    $ ttrack status my_old_issue
 
 Stop tracking...
 
-	$ ttrack stop
+    $ ttrack stop
 
-... or just start tracking a new issue
+... or just start tracking a new issue, previous will be stopped automatically
 
-	$ ttrack start my_new_issue
+    $ ttrack start my_new_issue
 
 Get a list of tracked issues
 
-	$ ttrack report
+    $ ttrack report
 
 Get a report for a particular issue name
 
-	$ ttrack report my_issue
+    $ ttrack report my_issue
 
 Edit start and/or stop time for a given issue *number* (use UTC timestamps)
 
-	$ ttrack report
-	$ ttrack beguin <issue_number> 2011-01-01 00:00
-	$ ttrack end <issue_number> 2011-01-02 00:00:59
+    $ ttrack report
+    $ ttrack beguin <issue_number> 2011-01-01 00:00
+    $ ttrack end <issue_number> 2011-01-02 00:00:59

@@ -19,5 +19,7 @@ case ARGV[0]
   when 'end' then
     timestamp = ARGV[3] ? "%s %s" % ARGV[2..3] : ARGV[2]
     tt.setstop ARGV[1], timestamp
-  else tt.usage
+  when 'help' then
+    tt.usage
+  else tt.start ARGV[0], ARGV[1]
 end
