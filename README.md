@@ -22,13 +22,9 @@ Initialize sqlite3 db (defualted to $HOME/.timetrackerdb)
     $ ttrack
     $ ls ~/.timetrackerdb
 
-Start tracking an issue
+Start tracking an issue (with optional notes if needed)
 
     $ ttrack start my_issue "my notes between quotes"
-
-Works without "start" command too (unless my_issue is a command)
-
-    $ ttrack my_issue "my notes between quotes"
 
 Check current tracked issue's status / time tracked
 
@@ -57,5 +53,5 @@ Get a report for a particular issue name
 Edit start and/or stop time for a given issue *number* (use UTC timestamps)
 
     $ ttrack report
-    $ ttrack beguin <issue_number> 2011-01-01 00:00
+    $ ttrack begin <issue_number> 2011-01-01 00:00
     $ ttrack end <issue_number> 2011-01-02 00:00:59

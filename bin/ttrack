@@ -1,25 +1,61 @@
 #!/Users/alex/.rvm/rubies/ruby-1.9.2-p290/bin/ruby -w
 require 'ttrack'
 
-tt = TTrack.new
+def usage(tt)
+  puts 'Usage: ttrack [%s]' % (tt.commands * '|')
+end
+
+databasename = "%s/%s" % [ENV['HOME'], ".timetrackerdb"]
+tt = TTrack.new databasename
 case ARGV[0]
   when 'start' then
-    tt.start ARGV[1], ARGV[2]
+    if tt.start(ARGV[1], ARGV[2])
+      puts 'Start tracking issue "%s"' % ARGV[1]
+    else
+      usage(tt)
+    end
+
   when 'stop' then
-    tt.stop
+    unless tt.stop
+      puts 'Not tracking'
+    end
+
   when 'status' then
-    tt.status ARGV[1]
+    status = tt.status(ARGV[1])
+    unless status.nil?
+      puts 'Total time tracked for task "%s": %d seconds' % [status[:task], status[:elapsed]]
+    else
+      puts "Currently not tracking"
+    end
+
   when 'init' then
+    puts 'Initlializing empty sqlite database: %s' % databasename
     tt.init
+
   when 'report' then
-    tt.report ARGV[1]
-  when 'beguin' then
-    timestamp = ARGV[3] ? "%s %s" % ARGV[2..3] : ARGV[2]
-    tt.setstart ARGV[1], timestamp
+    report = tt.report(ARGV[1])
+    unless report.nil?
+      report.each do |line|
+        puts line
+      end
+    end
+
+  when 'begin' then
+    begin
+      timestamp = ARGV[3] ? "%s %s" % ARGV[2..3] : ARGV[2]
+      tt.set_tstart! ARGV[1], timestamp
+    rescue Exception => e
+      usage(tt)
+    end
+
   when 'end' then
-    timestamp = ARGV[3] ? "%s %s" % ARGV[2..3] : ARGV[2]
-    tt.setstop ARGV[1], timestamp
-  when 'help' then
-    tt.usage
-  else tt.start ARGV[0], ARGV[1]
+    begin
+      timestamp = ARGV[3] ? "%s %s" % ARGV[2..3] : ARGV[2]
+      tt.set_tstop! ARGV[1], timestamp
+    rescue
+      usage(tt)
+    end
+
+  else
+    usage(tt)
 end
