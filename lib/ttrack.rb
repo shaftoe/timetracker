@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
+#
+# = TTrack class
+#
+# Class that handles communication between CLI and data storage
+#
 class TTrack
 
+  # At each call we need to declare the datastore
   def initialize
     @db = DataStore.new
   end
@@ -25,7 +31,7 @@ class TTrack
       status = @db.getstatus
       if status
         delta = Time.now - gettstart(@db.getcurrent)
-        puts "Task '%s' run time: %d seconds (%.2f hours)" % [status[1], delta, delta / 3600]
+        puts "Tracking task '%s' | Run time: %d seconds (%.2f hours)" % [status[1], delta, delta / 3600]
       else
         puts "Not tracking"
       end
@@ -47,15 +53,16 @@ class TTrack
   def report issuename
     if issuename.nil?
       r = @db.gettimesheet
-      pstring = "%s | %s | %s | %s | %s"
-      puts "id | name | tstart | tstop | notes"
+      pstring = "%s | %s | %s | %s | %s | %d"
+      puts "id | name | tstart | tstop | notes | duration"
     else
       r = @db.getissuesidsbyname issuename
-      pstring = "%s | %s | %s | %s"
-      puts "id | tstart | tstop | notes"
+      pstring = "%s | %s | %s | %s | %d"
+      puts "id | tstart | tstop | notes | duration"
     end
     unless r[0].nil?
         r.each do |x|
+        x << getissueduration(x[0])
         puts pstring % x
       end
     else
@@ -143,12 +150,8 @@ class TTrack
 
   def getissueduration issueid
     timestamps = @db.gettime issueid
-    if timestamps and timestamps[1]
-      t0, t1 = gettimeobject(timestamps[0]), gettimeobject(timestamps[1])
-      t1 - t0
-    else
-      false
-    end
+    t0, t1 = gettimeobject(timestamps[0]), gettimeobject(timestamps[1])
+    t1 - t0
   end
 
   def gettstart issueid
