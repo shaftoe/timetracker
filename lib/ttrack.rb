@@ -7,8 +7,8 @@
 class TTrack
 
   # At each call we need to declare the datastore
-  def initialize
-    @db = DataStore.new
+  def initialize datastore
+    @db = DataStore.new datastore
   end
 
   def start issuename, notes

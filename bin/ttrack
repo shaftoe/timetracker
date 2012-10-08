@@ -1,7 +1,7 @@
 #!/Users/alex/.rvm/rubies/ruby-1.9.2-p290/bin/ruby -w
 require 'ttrack'
 
-tt = TTrack.new
+tt = TTrack.new ".timetrackerdb"
 case ARGV[0]
   when 'start' then
     tt.start ARGV[1], ARGV[2]
