@@ -63,7 +63,7 @@ class TTrack::DataStore
   public
   def getcurrent
     current = @db.execute "SELECT current FROM system"
-    current[0][0] == "" ? nil : current[0][0]
+    current[0][0] == "" ? false : current[0][0]
   end
 
   def getstatus
@@ -76,7 +76,7 @@ class TTrack::DataStore
     end
   end
 
-  def startnew issuename, notes=''
+  def startnew issuename, notes
     @db.execute "INSERT INTO timesheet ( name, notes ) VALUES ( '%s', '%s' )" %
       [issuename, notes]
     latest = @db.execute "SELECT id FROM timesheet ORDER BY id DESC LIMIT 1"
@@ -88,8 +88,9 @@ class TTrack::DataStore
     if current
       @db.execute "UPDATE timesheet set tstop = datetime('now') WHERE id = %d" % current
       @db.execute "UPDATE system SET current = '', latest = '%d'" % current
+      true
     else
-      p "Not tracking"
+      false
     end
   end
 

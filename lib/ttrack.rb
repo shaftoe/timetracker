@@ -11,41 +11,35 @@ class TTrack
     @db = DataStore.new datastore
   end
 
-  def start issuename, notes
-    unless issuename.nil?
-      if @db.getcurrent
-        @db.stoprunning
-      end
+  # Start tracking an issue, stop the current one if running
+  # Return boolean to indicate if the action was succesfull or not
+  def start issuename, notes=''
+    unless issuename.nil? or issuename.empty?
+      @db.stoprunning if @db.getcurrent
       @db.startnew issuename, notes
+      true
     else
-      usage
+      false
     end
   end
 
+  # Stop the current running task
+  # Return false if no current running task, true otherwise
   def stop
-    @db.stoprunning
+    @db.stoprunning ? true : false
   end
 
-  def status issuename
-    unless issuename
+  def status issuename=nil
+    if issuename.nil?
       status = @db.getstatus
       if status
         delta = Time.now - gettstart(@db.getcurrent)
-        puts "Tracking task '%s' | Run time: %d seconds (%.2f hours)" % [status[1], delta, delta / 3600]
-      else
-        puts "Not tracking"
+        {:task => status[1], :elapsed => delta, :elapsed_hours => (delta / 3600)}
       end
     else
       total = gettotalissueduration(issuename)
       unless total == 0
-        puts "Total seconds for task %s: %d (%.2f hours)" % 
-          [
-            issuename,
-            total,
-            total / 3600
-          ]
-      else
-        puts "No entry for issue '%s'" % issuename
+        {:task => issuename, :elapsed => total, :elapsed_hours => (total / 3600)}
       end
     end
   end
