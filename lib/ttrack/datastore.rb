@@ -105,7 +105,7 @@ class TTrack::DataStore
   end
 
   def gettimesheet
-    @db.execute "SELECT id,name,tstart,tstop,notes FROM timesheet"
+    @db.execute "SELECT id,name,tstart,tstop,synced,notes FROM timesheet"
   end
 
   def gettimesbyissuename issuename
@@ -116,8 +116,8 @@ class TTrack::DataStore
     @db.execute "SELECT tstart,tstop FROM timesheet WHERE name='%s'" % issuename
   end
 
-  def getissuesidsbyname issuename
-    @db.execute "SELECT id,tstart,tstop,notes FROM timesheet WHERE name='%s'" % issuename
+  def getissuesbyname issuename
+    @db.execute "SELECT id,tstart,tstop,synced, notes FROM timesheet WHERE name='%s'" % issuename
   end
 
   def settstart id, tstart

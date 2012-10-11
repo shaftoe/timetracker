@@ -46,24 +46,38 @@ class TTrack
     end
   end
 
-  def report issuename
-    if issuename.nil?
+  # Get a report for the given issue name
+  # If no issue is give, get a report for everything
+  def report issuename=nil
+    result = Array.new
+
+    if issuename.nil? or issuename.empty?
       r = @db.gettimesheet
-      pstring = "%s | %s | %s | %s | %s | %d"
-      puts "id | name | tstart | tstop | notes | duration"
-    else
-      r = @db.getissuesidsbyname issuename
-      pstring = "%s | %s | %s | %s | %d"
-      puts "id | tstart | tstop | notes | duration"
-    end
-    unless r[0].nil?
-        r.each do |x|
-        x << getissueduration(x[0])
-        puts pstring % x
+      r.each do |line|
+          result << {
+          :task => line[0],
+          :name => line[1],
+          :tstart => line[2],
+          :tstop => line[3],
+          :synced => line[4],
+          :notes => line[5],
+          :elapsed => getissueduration(line[0])
+        }
       end
     else
-      usage
+      r = @db.getissuesbyname issuename
+      r.each do |line|
+          result << {
+          :task => line[0],
+          :tstart => line[1],
+          :tstop => line[2],
+          :synced => line[3],
+          :notes => line[4],
+          :elapsed => getissueduration(line[0])
+        }
+      end
     end
+    result.empty? ? nil : result
   end
 
   def setstart issueid, timestamp
