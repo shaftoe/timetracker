@@ -13,12 +13,15 @@ class TestTimeTracker < Test::Unit::TestCase
 
   def test001_status
     tt = TTrack.new 'testdb'
+    assert tt.commands.include? :status
     assert_equal nil, tt.status
   end
 
   def test002_start_stop
     tt = TTrack.new 'testdb'
+    assert tt.commands.include? :start
     assert tt.start('issuename_test', 'notes_test')
+    assert tt.commands.include? :stop
     assert tt.stop
     assert_equal false, tt.stop
   end
@@ -55,6 +58,7 @@ class TestTimeTracker < Test::Unit::TestCase
 
   def test007_report
     tt = TTrack.new 'testdb'
+    assert tt.commands.include? :report
     report = tt.report
     assert_equal Hash, report[0].class
   end
@@ -76,6 +80,13 @@ class TestTimeTracker < Test::Unit::TestCase
     assert tt.start('issuename_test')
     report = tt.report('issuename_test')
     assert_equal Hash, report[1].class
+  end
+
+  def test011_cleanup_db
+    tt = TTrack.new 'testdb'
+    assert tt.commands.include? :init
+    assert_equal [], tt.init
+    assert_equal nil, tt.report
   end
 
 end

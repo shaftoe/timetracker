@@ -98,8 +98,8 @@ class TTrack
     @db.cleanup
   end
 
-  def usage
-    puts "Usage: ttrack [start|stop|status|init|report|begin|end] issue_name"
+  def commands
+    [:start, :stop, :status, :init, :report, :begin, :end]
   end
 
   private
