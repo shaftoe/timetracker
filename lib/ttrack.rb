@@ -29,6 +29,8 @@ class TTrack
     @db.stoprunning ? true : false
   end
 
+  # Get current running task status if no issuename given
+  # Otherwise get total duration for named task (i.e. for any matching time entry)
   def status issuename=nil
     if issuename.nil?
       status = @db.getstatus
@@ -38,7 +40,7 @@ class TTrack
       end
     else
       total = gettotalissueduration(issuename)
-      unless total == 0
+      unless total.nil?
         {:task => issuename, :elapsed => total, :elapsed_hours => (total / 3600)}
       end
     end
@@ -139,7 +141,7 @@ class TTrack
         total = total + (t1 - t0)
       end
     end
-    total
+    r[0].nil? ? nil : total
   end
 
   def getissueduration issueid
