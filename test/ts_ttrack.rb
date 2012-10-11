@@ -4,9 +4,16 @@ require 'TTrack'
 
 class TestTimeTracker < Test::Unit::TestCase
 
-  def test_easy
-    tt = TTrack.new '.testdb'
+  def test_init
+    tt = TTrack.new 'testdb'
     assert_equal tt.class, TTrack
+  end
+
+  def test_start_stop
+    tt = TTrack.new 'testdb'
+    assert_equal true, tt.start('issuename_test', 'notes_test')
+    assert_equal true, tt.stop
+    assert_equal false, tt.stop
   end
 
 end
