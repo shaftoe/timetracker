@@ -4,7 +4,7 @@ require 'sqlite3'
 class TTrack::DataStore
 
   def initialize dbname, timezone="+02:00", version='v0.1.4', verbosity=0
-    @dbname = "%s/%s" % [ENV['HOME'], dbname]
+    @dbname = dbname
     @timezone = timezone
     @version = version
     @verbosity = verbosity
