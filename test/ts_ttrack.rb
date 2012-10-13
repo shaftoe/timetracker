@@ -6,7 +6,7 @@ require 'FileUtils'
 class TestTimeTracker < Test::Unit::TestCase
 
   def setup
-    FileUtils.rm('testdb')  # Remove testing db before
+    FileUtils.rm('testdb')  # Remove testing db before any test
     @tt = TTrack.new('testdb')
   end
 
@@ -88,6 +88,26 @@ class TestTimeTracker < Test::Unit::TestCase
     assert @tt.commands.include? :init
     assert_equal [], @tt.init
     assert_nil @tt.report
+  end
+
+  def test_set_tstart
+    timestamp_short = '2010-01-01 00:00'
+    timestamp_full = '2010-01-01 00:00:00'
+    assert @tt.start('issuename_test')
+    assert @tt.set_tstart!(1, timestamp_short)
+    assert_match timestamp_short, @tt.report('issuename_test')[0][:tstart]
+    assert @tt.set_tstart!(1, timestamp_full)
+    assert_equal timestamp_full, @tt.report('issuename_test')[0][:tstart]
+  end
+
+  def test_set_tstop
+    timestamp_short = '2010-01-01 00:00'
+    timestamp_full = '2010-01-01 00:00:00'
+    assert @tt.start('issuename_test')
+    assert @tt.set_tstop!(1, timestamp_short)
+    assert_match timestamp_short, @tt.report('issuename_test')[0][:tstop]
+    assert @tt.set_tstop!(1, timestamp_full)
+    assert_equal timestamp_full, @tt.report('issuename_test')[0][:tstop]
   end
 
 end

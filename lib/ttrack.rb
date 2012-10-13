@@ -80,24 +80,31 @@ class TTrack
     result.empty? ? nil : result
   end
 
-  def setstart issueid, timestamp
-    if validateissueid issueid
-      t = validatetimestamp timestamp
-      @db.settstart issueid, t
+  # Overwrite tstart for given issue with given timestamp
+  def set_tstart! issueid, timestamp
+    if validateissueid(issueid)
+      t = validatetimestamp(timestamp)
+      @db.settstart(issueid, t)
+      true
+    else
+      false
     end
   end
 
-  def setstop issueid, timestamp
+  # Override tstop for given issue
+  def set_tstop! issueid, timestamp
     if validateissueid issueid
       t = validatetimestamp timestamp
       @db.settstop issueid, t
     end
   end
 
+  # Cleanup the database
   def init
     @db.cleanup
   end
 
+  # List of available public methods
   def commands
     [:start, :stop, :status, :init, :report, :begin, :end]
   end
