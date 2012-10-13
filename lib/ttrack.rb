@@ -36,12 +36,12 @@ class TTrack
       status = @db.getstatus
       if status
         delta = Time.now - gettstart(@db.getcurrent)
-        {:task => status[1], :elapsed => delta, :elapsed_hours => (delta / 3600)}
+        {:task => status[1], :elapsed => delta}
       end
     else
       total = gettotalissueduration(issuename)
       unless total.nil?
-        {:task => issuename, :elapsed => total, :elapsed_hours => (total / 3600)}
+        {:task => issuename, :elapsed => total}
       end
     end
   end

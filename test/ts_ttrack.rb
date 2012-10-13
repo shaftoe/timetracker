@@ -5,88 +5,89 @@ require 'FileUtils'
 
 class TestTimeTracker < Test::Unit::TestCase
 
-  def test000_init
+  def setup
     FileUtils.rm('testdb')  # Remove testing db before
-    tt = TTrack.new 'testdb'
-    assert_equal tt.class, TTrack
+    @tt = TTrack.new('testdb')
   end
 
-  def test001_status
-    tt = TTrack.new 'testdb'
-    assert tt.commands.include? :status
-    assert_equal nil, tt.status
+  def test_init
+    assert_equal @tt.class, TTrack
   end
 
-  def test002_start_stop
-    tt = TTrack.new 'testdb'
-    assert tt.commands.include? :start
-    assert tt.start('issuename_test', 'notes_test')
-    assert tt.commands.include? :stop
-    assert tt.stop
-    assert_equal false, tt.stop
+  def test_status
+    assert @tt.commands.include? :status
+    assert_nil @tt.status
   end
 
-  def test003_status_with_data_when_nothing_running
-    tt = TTrack.new 'testdb'
-    status = tt.status('issuename_test')
+  def test_start_stop
+    assert @tt.commands.include? :start
+    assert @tt.start('issuename_test', 'notes_test')
+    assert @tt.commands.include? :stop
+    assert @tt.stop
+    assert_equal false, @tt.stop
+  end
+
+  def test_status_when_nothing_running
+    assert_nil @tt.status
+  end
+
+  def test_status_with_task_running
+    assert @tt.start('issuename_test')
+    status = @tt.status
     assert_equal 'issuename_test', status[:task]
-    assert_equal 0, status[:elapsed]
-    assert_equal Float, status[:elapsed_hours].class
+    assert_kind_of Float, status[:elapsed]
+    assert_not_equal 0, status[:elapsed]
   end
 
-  def test004_status_when_task_running
-    tt = TTrack.new 'testdb'
-    assert tt.start('issuename_test_status')
-
-    status = tt.status
+  def test_status_when_task_running
+    assert @tt.start('issuename_test_status')
+    status = @tt.status
     assert_equal 'issuename_test_status', status[:task]
   end
 
-  def test005_status_with_old_tasks
-    tt = TTrack.new 'testdb'
-    status = tt.status('issuename_test')
-    assert_equal 'issuename_test', status[:task]
+  def test_status_with_old_tasks
+    assert @tt.start('issuename_test')
+    assert @tt.start('issuename_test_2')
+    assert @tt.start('issuename_test')
+    assert @tt.start('issuename_test_2')
+    status = @tt.status('issuename_test')
     assert_equal 0, status[:elapsed]
-    assert_equal Float, status[:elapsed_hours].class
+    assert_kind_of Float, status[:elapsed]
+    assert_equal 'issuename_test', status[:task]
   end
 
-  def test006_status_wrong
-    tt = TTrack.new 'testdb'
-    status = tt.status('foo_issuename')
-    assert_equal nil, status
+  def test_status_wrong
+    status = @tt.status('foo_issuename')
+    assert_nil status
   end
 
-  def test007_report
-    tt = TTrack.new 'testdb'
-    assert tt.commands.include? :report
-    report = tt.report
-    assert_equal Hash, report[0].class
+  def test_report_void
+    assert @tt.commands.include? :report
+    assert_nil @tt.report
   end
 
-  def test008_report_with_name
-    tt = TTrack.new 'testdb'
-    report = tt.report('issuename_test')
-    assert_equal Hash, report[0].class
+  def test_report_with_name
+    assert @tt.start('issuename_test')
+    report = @tt.report('issuename_test')
+    assert_kind_of Hash, report[0]
   end
 
-  def test009_report_with_fakename
-    tt = TTrack.new 'testdb'
-    report = tt.report('foo_issuename')
-    assert_equal nil, report
+  def test_report_with_fakename
+    report = @tt.report('foo_issuename')
+    assert_nil report
   end
 
-  def test010_duplicated_issuename
-    tt = TTrack.new 'testdb'
-    assert tt.start('issuename_test')
-    report = tt.report('issuename_test')
-    assert_equal Hash, report[1].class
+  def test_duplicated_issuename
+    assert @tt.start('issuename_test_clone')
+    assert @tt.start('issuename_test_clone')
+    report = @tt.report('issuename_test_clone')
+    assert_kind_of Hash, report[1]
   end
 
-  def test011_cleanup_db
-    tt = TTrack.new 'testdb'
-    assert tt.commands.include? :init
-    assert_equal [], tt.init
-    assert_equal nil, tt.report
+  def test_cleanup_db
+    assert @tt.commands.include? :init
+    assert_equal [], @tt.init
+    assert_nil @tt.report
   end
 
 end
