@@ -23,7 +23,7 @@ case ARGV[0]
   when 'status' then
     status = tt.status(ARGV[1])
     unless status.nil?
-      puts status
+      puts 'Tracking task "%s", started %d seconds ago' % [status[:task], status[:elapsed]]
     else
       puts "Not tracking"
     end
