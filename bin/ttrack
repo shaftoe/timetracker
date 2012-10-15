@@ -16,14 +16,23 @@ case ARGV[0]
     end
 
   when 'stop' then
-    unless tt.stop
-      puts 'Not tracking'
+    stop = tt.stop
+    if stop
+      puts 'Stop issue "%s", run for %s' % [
+        stop[:name],
+        Time.at(stop[:elapsed]).utc.strftime("%H hours %M minutes %S seconds")
+      ]
+    else
+      puts('Not tracking')
     end
 
   when 'status' then
     status = tt.status(ARGV[1])
     unless status.nil?
-      puts 'Total time tracked for task "%s": %d seconds' % [status[:task], status[:elapsed]]
+      puts 'Stats for task "%s": %s' % [
+        status[:task],
+        Time.at(status[:elapsed]).utc.strftime("%H hours %M minutes %S seconds")
+      ]
     else
       puts "Currently not tracking"
     end

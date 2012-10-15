@@ -23,7 +23,8 @@ class TestTimeTracker < Test::Unit::TestCase
     assert @tt.commands.include? :start
     assert @tt.start('issuename_test', 'notes_test')
     assert @tt.commands.include? :stop
-    assert @tt.stop
+    result = @tt.stop
+    assert_equal result, {:name=>'issuename_test', :id=>1, :elapsed=>0}
     assert_equal false, @tt.stop
   end
 

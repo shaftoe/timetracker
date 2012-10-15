@@ -3,7 +3,7 @@ require 'sqlite3'
 
 class TTrack::DataStore
 
-  def initialize dbname, timezone="+02:00", version='v0.1.4', verbosity=0
+  def initialize dbname, timezone="+02:00", version='v0.2.1', verbosity=0
     @dbname = dbname
     @timezone = timezone
     @version = version
@@ -88,7 +88,7 @@ class TTrack::DataStore
     if current
       @db.execute "UPDATE timesheet set tstop = datetime('now') WHERE id = %d" % current
       @db.execute "UPDATE system SET current = '', latest = '%d'" % current
-      true
+      current.to_i
     else
       false
     end
@@ -118,6 +118,10 @@ class TTrack::DataStore
 
   def getissuesbyname issuename
     @db.execute "SELECT id,tstart,tstop,synced, notes FROM timesheet WHERE name='%s'" % issuename
+  end
+
+  def getnamebyissueid issueid
+    result = @db.execute "SELECT name FROM timesheet WHERE id=%d" % issueid
   end
 
   def settstart id, tstart

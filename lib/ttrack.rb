@@ -24,9 +24,14 @@ class TTrack
   end
 
   # Stop the current running task
-  # Return false if no current running task, true otherwise
+  # Return info about the stopped running task, false if it was not tracking
   def stop
-    @db.stoprunning ? true : false
+    result = @db.stoprunning
+    if result and result != []
+      { :name => @db.getnamebyissueid(result)[0][0], :id => result, :elapsed => getissueduration(result) }
+    else
+      false
+    end
   end
 
   # Get current running task status if no issuename given
@@ -189,3 +194,4 @@ end  # End TTrack class
 
 require 'ttrack/datastore'
 # TODO: add support for timezone
+# TODO: add version check
