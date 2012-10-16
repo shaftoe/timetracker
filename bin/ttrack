@@ -9,7 +9,14 @@ databasename = "%s/%s" % [ENV['HOME'], ".timetrackerdb"]
 tt = TTrack.new databasename
 case ARGV[0]
   when 'start' then
-    if tt.start(ARGV[1], ARGV[2])
+    stop = tt.start(ARGV[1], ARGV[2])
+    if stop and not stop[1].nil?
+      puts 'Stop tracking issue "%s", run for %s' % [
+        stop[1][:name],
+        Time.at(stop[1][:elapsed]).utc.strftime("%H hours %M minutes %S seconds")
+      ]
+      puts 'Start tracking issue "%s"' % ARGV[1]
+    elsif stop
       puts 'Start tracking issue "%s"' % ARGV[1]
     else
       usage(tt)

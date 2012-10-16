@@ -28,6 +28,13 @@ class TestTimeTracker < Test::Unit::TestCase
     assert_equal false, @tt.stop
   end
 
+  def test_start_start_stop
+    assert @tt.start('issuename_test1')
+    result = @tt.start('issuename_test2')
+    assert_equal true, result[0]
+    assert_equal result[1], {:name=>'issuename_test1', :id=>1, :elapsed=>0}
+  end
+
   def test_status_when_nothing_running
     assert_nil @tt.status
   end
@@ -38,12 +45,6 @@ class TestTimeTracker < Test::Unit::TestCase
     assert_equal 'issuename_test', status[:task]
     assert_kind_of Float, status[:elapsed]
     assert_not_equal 0, status[:elapsed]
-  end
-
-  def test_status_when_task_running
-    assert @tt.start('issuename_test_status')
-    status = @tt.status
-    assert_equal 'issuename_test_status', status[:task]
   end
 
   def test_status_with_old_tasks

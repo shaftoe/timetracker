@@ -15,9 +15,9 @@ class TTrack
   # Return boolean to indicate if the action was succesfull or not
   def start issuename, notes=''
     unless issuename.nil? or issuename.empty?
-      @db.stoprunning if @db.getcurrent
+      stopresult = stop if @db.getcurrent
       @db.startnew issuename, notes
-      true
+      [true, stopresult]
     else
       false
     end
