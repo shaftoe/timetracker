@@ -35,10 +35,6 @@ class TestTimeTracker < Test::Unit::TestCase
     assert_equal result[1], {:name=>'issuename_test1', :id=>1, :elapsed=>0}
   end
 
-  def test_status_when_nothing_running
-    assert_nil @tt.status
-  end
-
   def test_status_with_task_running
     assert @tt.start('issuename_test')
     status = @tt.status
