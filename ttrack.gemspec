@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'ttrack'
-  s.version     = '0.2.2'
-  s.date        = '2012-10-18'
+  s.version     = '0.3.0'
+  s.date        = '2012-10-28'
   s.summary     = "Time Tracker"
   s.description = "A simple CLI time tracker"
   s.authors     = ["Alexander Fortin"]

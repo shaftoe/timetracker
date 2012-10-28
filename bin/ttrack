@@ -50,10 +50,24 @@ case ARGV[0]
 
   when 'report' then
     report = tt.report(ARGV[1])
-    unless report.nil?
-      report.each do |line|
-        puts line
+    lenghts = {:task => 4, :name => 4, :elapsed => 7}
+    report.each do |line|
+      lenghts.keys.each do |i|
+        lenghts[i] = line[i].to_s.length if line[i].to_s.length >= lenghts[i]
       end
+    end
+    puts "%#{lenghts[:task]}s | %-#{lenghts[:name]}s | %s | %s | %-#{lenghts[:elapsed] - 2}s | %s" %
+      ["Task", "Name", "Start              ", "Stop               ", "Elapsed", "Notes"]
+    report.each do |line|
+      puts "%#{lenghts[:task]}s | %-#{lenghts[:name]}s | %s | %s | %-#{lenghts[:elapsed] - 2}d | %s" %
+        [
+          line[:task],
+          line[:name],
+          line[:tstart],
+          line[:tstop],
+          line[:elapsed],
+          line[:notes]
+        ]
     end
 
   when 'begin' then
