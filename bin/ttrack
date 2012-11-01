@@ -54,21 +54,26 @@ case ARGV[0]
     report.each do |line|
       lenghts.keys.each do |i|
         if i == :elapsed
-          lenghts[i] = line[i].to_i.to_s.length if line[i].to_s.length >= lenghts[i]
+          lenghts[i] = line[i].to_i.to_s.length if line[i].to_i.to_s.length >= lenghts[i]
+          puts lenghts[i]
         else
           lenghts[i] = line[i].to_s.length if line[i].to_s.length >= lenghts[i]
         end
       end
     end
+
+    # Fix Name column width if report name is given
+    lenghts[:name] = ARGV[1].nil? ? lenghts[:name] : ARGV[1].length
+
     puts "%#{lenghts[:task]}s | %-#{lenghts[:name]}s | %s | %s | %-#{lenghts[:elapsed]}s | %s" %
       ["Task", "Name", "Start              ", "Stop               ", "Elapsed", "Notes"]
     report.each do |line|
       puts "%#{lenghts[:task]}s | %-#{lenghts[:name]}s | %s | %s | %-#{lenghts[:elapsed]}d | %s" %
         [
           line[:task],
-          line[:name],
+          line[:name].nil? ? ARGV[1] : line[:name],
           line[:tstart],
-          line[:tstop],
+          line[:tstop].nil? ? '    < running >    ' : line[:tstop],
           line[:elapsed],
           line[:notes]
         ]
