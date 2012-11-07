@@ -55,7 +55,6 @@ case ARGV[0]
       lenghts.keys.each do |i|
         if i == :elapsed
           lenghts[i] = line[i].to_i.to_s.length if line[i].to_i.to_s.length >= lenghts[i]
-          puts lenghts[i]
         else
           lenghts[i] = line[i].to_s.length if line[i].to_s.length >= lenghts[i]
         end
