@@ -99,13 +99,23 @@ class TestTimeTracker < Test::Unit::TestCase
   end
 
   def test_set_tstop
-    timestamp_short = '2010-01-01 00:00'
-    timestamp_full = '2010-01-01 00:00:00'
+    timestamp_short = '2010-02-01 00:00'
+    timestamp_full = '2010-02-01 00:00:00'
     assert @tt.start('issuename_test')
     assert @tt.set_tstop!(1, timestamp_short)
     assert_match timestamp_short, @tt.report('issuename_test')[0][:tstop]
     assert @tt.set_tstop!(1, timestamp_full)
     assert_equal timestamp_full, @tt.report('issuename_test')[0][:tstop]
+  end
+
+  def test_set_start_stop_1year
+    timestamp_start = '2010-02-01 00:00:00'
+    timestamp_stop = '2011-02-01 00:00:00'
+    assert @tt.start('issuename_test')
+    assert @tt.stop
+    assert @tt.set_tstart!(1, timestamp_start)
+    assert @tt.set_tstop!(1, timestamp_stop)
+    assert_equal @tt.report[0][:elapsed], 31536000
   end
 
 end

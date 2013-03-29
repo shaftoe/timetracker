@@ -28,7 +28,11 @@ class TTrack
   def stop
     result = @db.stoprunning
     if result and result != []
-      { :name => @db.getnamebyissueid(result)[0][0], :id => result, :elapsed => getissueduration(result) }
+      { 
+        :name => @db.getnamebyissueid(result)[0][0],
+        :id => result,
+        :elapsed => getissueduration(result)
+      }
     else
       false
     end
@@ -173,7 +177,7 @@ class TTrack
   def getissueduration issueid
     timestamps = @db.gettime issueid
     t0, t1 = gettimeobject(timestamps[0]), gettimeobject(timestamps[1])
-    t1 - t0
+    (t1 - t0).to_int
   end
 
   def gettstart issueid

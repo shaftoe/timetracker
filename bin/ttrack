@@ -11,8 +11,10 @@ case ARGV[0]
   when 'start' then
     stop = tt.start(ARGV[1], ARGV[2])
     if stop and not stop[1].nil?
-      puts 'Stop tracking issue "%s", run for %s' % [
+      days = stop[1][:elapsed] / 86400
+      puts 'Stop tracking issue "%s", run for %s%s' % [
         stop[1][:name],
+        days > 0 ? "%d days " % days : '',
         Time.at(stop[1][:elapsed]).utc.strftime("%H hours %M minutes %S seconds")
       ]
       puts 'Start tracking issue "%s"' % ARGV[1]
@@ -25,8 +27,10 @@ case ARGV[0]
   when 'stop' then
     stop = tt.stop
     if stop
-      puts 'Stop issue "%s", run for %s' % [
+      days = stop[:elapsed] / 86400
+      puts 'Stop issue "%s", run for %s%s' % [
         stop[:name],
+        days > 0 ? "%d days " % days : '',
         Time.at(stop[:elapsed]).utc.strftime("%H hours %M minutes %S seconds")
       ]
     else
@@ -36,8 +40,10 @@ case ARGV[0]
   when 'status' then
     status = tt.status(ARGV[1])
     unless status.nil?
-      puts 'Stats for task "%s": %s' % [
+      days = status[:elapsed] / 86400
+      puts 'Stats for task "%s": %s%s' % [
         status[:task],
+        days > 0 ? "%d days " % days : '',
         Time.at(status[:elapsed]).utc.strftime("%H hours %M minutes %S seconds")
       ]
     else
